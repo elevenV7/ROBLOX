@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROBUX - Blog Oficial de Noticias y Regalos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- ADSTERRA SOCIAL BAR -->
+    <script src="https://cleavegrate.com/3f/4a/21/3f4a21147415bcace85c05bb0d878d23.js"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Continuous Y-axis 3D Coin Rotation and Floating Effect */
+        @keyframes coinRotateFloat {
+            0% { transform: translateY(0px) rotateY(0deg); }
+            50% { transform: translateY(-4px) rotateY(180deg); }
+            100% { transform: translateY(0px) rotateY(360deg); }
+        }
+
+        .coin-container {
+            perspective: 600px;
+        }
+
+        .coin-3d {
+            width: 32px;
+            height: 32px;
+            transform-style: preserve-3d;
+            animation: coinRotateFloat 3.5s infinite ease-in-out;
+        }
+
+        /* Micro-interactions & Custom Utilities */
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-btn {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .blog-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Sticky Bottom Banner Animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .sticky-bottom-bar {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        /* Animación para el Carrusel Horizontal de Comentarios */
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-horizontal {
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center antialiased pb-24">
+
+    <!-- Header Sticky -->
+    <header class="w-full max-w-md bg-white/90 backdrop-blur-md border-b border-slate-200 px-5 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <!-- Moneda 3D a la izquierda de la palabra ROBUX -->
+            <div class="coin-container flex items-center justify-center">
+                <svg class="coin-3d text-amber-500 drop-shadow-md" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="50,5 88,27 88,73 50,95 12,73 12,27" fill="url(#goldGrad)" stroke="#b45309" stroke-width="4"/>
+                    <polygon points="50,18 76,33 76,67 50,82 24,67 24,33" fill="#fbbf24" stroke="#d97706" stroke-width="3"/>
+                    <rect x="38" y="38" width="24" height="24" rx="4" fill="#ffffff" stroke="#b45309" stroke-width="3" transform="rotate(45 50 50)"/>
+                    <defs>
+                        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fef08a" />
+                            <stop offset="50%" stop-color="#f59e0b" />
+                            <stop offset="100%" stop-color="#b45309" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <!-- Logo con Azul y Azul Oscuro -->
+            <a href="index.html" class="text-2xl font-black tracking-tight gradient-text">
+                ROBUX
+            </a>
+        </div>
+
+        <!-- Botón Menú Hamburguesa -->
+        <button id="hamburgerBtn" aria-label="Abrir Menú" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg flex flex-col justify-center items-center gap-1.5 transition-transform active:scale-95">
+            <span class="w-5 h-0.5 bg-slate-800 rounded-full transition-all"></span>
+            <span class="w-5 h-0.5 bg-slate-800 rounded-full transition-all"></span>
+            <span class="w-5 h-0.5 bg-slate-800 rounded-full transition-all"></span>
+        </button>
+    </header>
+
+    <!-- Menú Desplegable Lateral -->
+    <div id="menuOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+    <aside id="menuDrawer" class="fixed top-0 right-0 w-72 h-full bg-white z-50 shadow-2xl p-6 flex flex-col translate-x-full transition-transform duration-300 ease-out">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+            <span class="font-extrabold text-lg gradient-text">Menú Principal</span>
+            <button id="menuClose" class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors">
+                ✕
+            </button>
+        </div>
+        <nav class="flex flex-col gap-3">
+            <a href="index.html" class="font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-lg hover:bg-slate-50">
+                Inicio / Noticias
+            </a>
+            <a href="robux.html" class="gradient-btn text-white font-bold py-3 px-4 rounded-lg text-center flex items-center justify-center gap-2">
+                Reclamar Robux
+            </a>
+        </nav>
+        <div class="mt-auto pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
+            ROBUX Blog - Comunidad Gaming
+        </div>
+    </aside>
+
+    <!-- Contenedor Principal -->
+    <main class="w-full max-w-md px-4 pt-4 flex-1">
+
+        <!-- Primer Slot de Anuncio (300x250) -->
+        <div class="my-3 flex justify-center">
+            <div class="w-[300px] h-[250px] bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                <script>
+                  atOptions = {
+                    'key' : '8208da47343e4366c273b77953355560',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://cleavegrate.com/8208da47343e4366c273b77953355560/invoke.js"></script>
+            </div>
+        </div>
+
+        <div class="text-center my-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">PUBLICIDAD</span>
+        </div>
+
+        <div class="flex items-center gap-2.5 my-4">
+            <div class="w-1.5 h-5 rounded-sm bg-blue-600"></div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">DESTACADOS</h2>
+        </div>
+
+        <!-- Banner 320x50 Adsterra -->
+        <div class="my-3 flex justify-center">
+            <div class="w-[320px] h-[50px] bg-white border border-slate-200 rounded-lg flex items-center justify-center overflow-hidden shadow-sm">
+                <script>
+                  atOptions = {
+                    'key' : '15966ddc9060aebece751b15636a4e50',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://cleavegrate.com/15966ddc9060aebece751b15636a4e50/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Blog Principal (Slot Principal con Imagen Comprimida) -->
+        <a href="robux.html" class="blog-card block bg-white rounded-xl overflow-hidden border border-slate-200/80 shadow-sm hover:border-blue-300 my-4">
+            <div class="relative w-full bg-slate-950 flex items-center justify-center overflow-hidden">
+                <img 
+                    src="https://i.ibb.co/mF20w8hH/1000518066.png" 
+                    alt="Los mejores regalos de Roblox para fans" 
+                    class="w-full h-auto max-h-[350px] object-contain transition-transform duration-500 hover:scale-105"
+                    onerror="this.src='https://placehold.co/600x375/2563eb/ffffff?text=ROBUX+GIVEAWAY'"
+                />
+            </div>
+            <div class="p-4 flex flex-col gap-2.5">
+                <h3 class="text-lg font-extrabold text-slate-900 leading-snug hover:text-blue-600 transition-colors">
+                    Los mejores regalos de Roblox para fans: ideas para sorprender en 2026
+                </h3>
+                <p class="text-xs font-semibold text-slate-400">
+                    4 de septiembre de 2026
+                </p>
+                <div>
+                    <span class="gradient-btn inline-flex items-center gap-1.5 text-white font-bold text-xs px-4 py-2 rounded-lg">
+                        Leer más <span>→</span>
+                    </span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Segundo Slot de Anuncio (300x250) -->
+        <div class="my-6 flex justify-center">
+            <div class="w-[300px] h-[250px] bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                <script>
+                  atOptions = {
+                    'key' : '8208da47343e4366c273b77953355560',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://cleavegrate.com/8208da47343e4366c273b77953355560/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- WIDGET DE VERIFICACIÓN DE USUARIO -->
+        <section class="mt-6 bg-gradient-to-b from-white to-slate-50/80 rounded-xl p-5 border border-slate-200/90 shadow-md shadow-blue-900/5 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-28 h-28 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
+
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    <h3 class="text-sm font-black text-slate-900 tracking-tight">Verificación de Usuario</h3>
+                </div>
+                <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 uppercase tracking-wider">
+                    Sistema Activo
+                </span>
+            </div>
+
+            <!-- Paso 1: Input y Botón -->
+            <div id="verifyBox" class="flex flex-col gap-3">
+                <p class="text-xs text-slate-500 font-medium leading-relaxed">
+                    Ingresa tu nombre de usuario para comprobar la compatibilidad del sistema con tu dispositivo:
+                </p>
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="robloxUser" 
+                        placeholder="Ej: GamerPro_2026" 
+                        class="w-full px-3.5 py-3 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 font-bold text-slate-800 placeholder:font-normal placeholder:text-slate-400 transition-all shadow-inner"
+                    >
+                </div>
+                <button id="verifyBtn" class="gradient-btn text-white font-extrabold py-3 rounded-lg text-xs w-full cursor-pointer tracking-wide active:scale-[0.98] transition-transform">
+                    Comenzar
+                </button>
+            </div>
+
+            <!-- Paso 2: Pantalla de Carga con Timer -->
+            <div id="verifyLoading" class="hidden flex flex-col items-center justify-center py-5 gap-3 text-center">
+                <div class="relative flex items-center justify-center">
+                    <div class="w-8 h-8 border-3 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+                <div>
+                    <p id="loadingStatus" class="text-xs font-extrabold text-slate-700 transition-all">Conectando con el servidor...</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Por favor aguarde un momento</p>
+                </div>
+                <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden border border-slate-200/60 mt-1">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-blue-500 h-full w-0 transition-all duration-1000 ease-out"></div>
+                </div>
+            </div>
+
+            <!-- Paso 3: Éxito y Redirección -->
+            <div id="verifySuccess" class="hidden flex flex-col items-center justify-center py-3 gap-2.5 text-center">
+                <div class="w-10 h-10 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center font-black text-base border border-emerald-200">
+                    ✓
+                </div>
+                <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">¡Verificación completada!</h4>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Proceso finalizado correctamente para este perfil.</p>
+                </div>
+                <a href="robux.html" class="gradient-btn text-white font-black text-xs px-5 py-3 rounded-lg w-full text-center mt-1 shadow-md animate-pulse tracking-wide">
+                    INGRESAR - CLICK AQUI
+                </a>
+            </div>
+        </section>
+
+        <!-- Tercer Slot de Anuncio (300x250) -->
+        <div class="my-6 flex justify-center">
+            <div class="w-[300px] h-[250px] bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                <script>
+                  atOptions = {
+                    'key' : '8208da47343e4366c273b77953355560',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://cleavegrate.com/8208da47343e4366c273b77953355560/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Widget de Comentarios en Carrusel HORIZONTAL -->
+        <section class="mt-6 bg-white rounded-xl p-4 border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-100">
+                <h3 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    Comentarios Recientes <span class="bg-slate-100 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-extrabold">En Vivo</span>
+                </h3>
+                <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sincronizado
+                </span>
+            </div>
+
+            <!-- Contenedor con Desplazamiento Horizontal -->
+            <div id="commentCarousel" class="min-h-[85px] flex items-center relative overflow-hidden">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN "PARA TI" (Slot del Blog con Imagen Comprimida) -->
+        <div class="flex items-center gap-2.5 mt-8 mb-4">
+            <div class="w-1.5 h-5 rounded-sm bg-blue-600"></div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">PARA TI</h2>
+        </div>
+
+        <a href="robux.html" class="blog-card block bg-white rounded-xl overflow-hidden border border-slate-200/80 shadow-sm hover:border-blue-300 mb-6">
+            <div class="relative w-full bg-slate-950 flex items-center justify-center overflow-hidden">
+                <img 
+                    src="https://i.ibb.co/mF20w8hH/1000518066.png" 
+                    alt="Recomendación para ti" 
+                    class="w-full h-auto max-h-[350px] object-contain transition-transform duration-500 hover:scale-105"
+                    onerror="this.src='https://placehold.co/600x375/2563eb/ffffff?text=ROBUX+GIVEAWAY'"
+                />
+            </div>
+            <div class="p-4 flex flex-col gap-2.5">
+                <h3 class="text-lg font-extrabold text-slate-900 leading-snug hover:text-blue-600 transition-colors">
+                    Sorteo exclusivo de Robux y códigos especiales por tiempo limitado
+                </h3>
+                <p class="text-xs font-semibold text-slate-400">
+                    Actualizado hoy
+                </p>
+                <div>
+                    <span class="gradient-btn inline-flex items-center gap-1.5 text-white font-bold text-xs px-4 py-2 rounded-lg">
+                        Participar <span>→</span>
+                    </span>
+                </div>
+            </div>
+        </a>
+
+    </main>
+
+    <!-- Footer Institucional -->
+    <footer class="w-full max-w-md mt-6 px-6 py-8 border-t border-slate-200 text-center text-xs text-slate-500 flex flex-col gap-4">
+        <div class="flex justify-center gap-4 font-semibold text-slate-600">
+            <a href="#" id="openTerms" class="hover:underline cursor-pointer">Términos de Servicio</a>
+            <span>•</span>
+            <a href="#" id="openPrivacy" class="hover:underline cursor-pointer">Política de Privacidad</a>
+        </div>
+
+        <p class="leading-relaxed text-[11px] text-slate-400">
+            <strong>Descargo de responsabilidad:</strong> ROBUX Blog es un sitio web independiente de noticias y entretenimiento. No está afiliado, patrocinado ni respaldado por Roblox Corporation.
+        </p>
+
+        <p class="font-medium text-slate-400">
+            © 2026 ROBUX Blog. Todos los derechos reservados.
+        </p>
+    </footer>
+
+    <!-- Modal de Términos y Políticas -->
+    <div id="legalModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl max-h-[85vh] overflow-y-auto flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-slate-900 text-sm">Términos Legales y Descargo</h3>
+                <button id="closeModal" class="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-200 font-bold text-xs">✕</button>
+            </div>
+            <div class="text-xs text-slate-600 space-y-3 leading-relaxed">
+                <p><strong>1. Naturaleza del Sitio y Ficción Narrativa:</strong> Este sitio web opera estrictamente como una plataforma independiente de entretenimiento, ficción interactiva y divulgación de contenidos digitales. Todos los elementos visuales, dinámicas, menciones de divisas virtuales y simulaciones forman parte exclusiva de una experiencia narrativa y lúdica.</p>
+                <p><strong>2. Ausencia de Garantías y Promesas:</strong> La administración de este sitio no garantiza, promete ni asegura ningún tipo de recompensa económica, entrega de saldos reales, activos de juegos ni beneficios comerciales de ninguna índole. Las interacciones presentadas simulan entornos de entretenimiento basados en ficción.</p>
+                <p><strong>3. Limitación de Responsabilidad:</strong> El usuario reconoce y acepta de manera voluntaria que accede a este portal bajo su propia discreción. Los creadores, editores y operadores de este sitio web declinan de manera absoluta cualquier tipo de responsabilidad legal, civil o comercial derivada del uso, interpretación o expectativas de los visitantes respecto a los contenidos de ficción aquí expuestos.</p>
+                <p><strong>4. Ausencia de Afiliación Oficial:</strong> Este sitio no está afiliado, asociado, autorizado, respaldado ni oficialmente conectado de ninguna manera con Roblox Corporation ni con ninguna de sus subsidiarias o marcas asociadas.</p>
+            </div>
+            <button id="acceptModal" class="gradient-btn text-white text-xs font-bold py-2.5 rounded-lg w-full mt-2">ENTENDIDO Y CONFORME</button>
+        </div>
+    </div>
+
+    <!-- Banner Flotante Sticky al Fondo (Mobile CTA) -->
+    <div class="sticky-bottom-bar fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-3 z-40 flex items-center justify-center shadow-lg">
+        <div class="w-full max-w-md flex items-center justify-between gap-3 px-2">
+            <div class="flex items-center gap-2.5">
+                <span class="text-xl animate-bounce">🎁</span>
+                <div>
+                    <div class="text-xs font-black text-white">¿Buscas Robux Gratis?</div>
+                    <div class="text-[10px] text-slate-300">Sorteo activo para lectores</div>
+                </div>
+            </div>
+            <a href="robux.html" class="gradient-btn text-white text-xs font-black px-4 py-2 rounded-lg whitespace-nowrap">
+                RECLAMAR AHORA
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Menú Hamburguesa
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const menuDrawer = document.getElementById('menuDrawer');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuClose = document.getElementById('menuClose');
+
+        function openMenu() {
+            menuOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                menuOverlay.classList.add('opacity-100');
+                menuDrawer.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeMenu() {
+            menuDrawer.classList.add('translate-x-full');
+            menuOverlay.classList.remove('opacity-100');
+            setTimeout(() => menuOverlay.classList.add('hidden'), 300);
+        }
+
+        hamburgerBtn.addEventListener('click', openMenu);
+        menuClose.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // Verificador de Usuario con Timer Neutro de 10 segundos
+        document.getElementById('verifyBtn').addEventListener('click', function() {
+            const user = document.getElementById('robloxUser').value.trim();
+            if(!user) {
+                alert('Por favor ingresa un nombre de usuario.');
+                return;
+            }
+            document.getElementById('verifyBox').classList.add('hidden');
+            document.getElementById('verifyLoading').classList.remove('hidden');
+            
+            const progressBar = document.getElementById('progressBar');
+            const loadingStatus = document.getElementById('loadingStatus');
+            
+            setTimeout(() => { loadingStatus.innerText = "Comprobando disponibilidad de sesión..."; progressBar.style.width = "40%"; }, 2500);
+            setTimeout(() => { loadingStatus.innerText = "Sincronizando ID y datos generales..."; progressBar.style.width = "85%"; }, 6500);
+            setTimeout(() => { loadingStatus.innerText = "¡Proceso finalizado con éxito!"; progressBar.style.width = "100%"; }, 9200);
+            
+            setTimeout(() => {
+                document.getElementById('verifyLoading').classList.add('hidden');
+                document.getElementById('verifySuccess').classList.remove('hidden');
+            }, 10000);
+        });
+
+        // Carrusel de Comentarios Horizontal
+        const comments = [
+            { user: "GamerPro_99", time: "Hace 12 min", text: "Excelente artículo, la guía paso a paso funcionó correctamente para verificar la cuenta.", avatar: "GamerPro99" },
+            { user: "Sofi_Blox2026", time: "Hace 28 min", text: "Al principio tenía dudas pero el proceso de validación de usuario es muy rápido.", avatar: "SofiaRoblox" },
+            { user: "Mateo_RBX", time: "Hace 1 hora", text: "Muy buena información actualizada para este año, gracias por compartir el método.", avatar: "MateoRBX" },
+            { user: "LucasGamer_Arg", time: "Hace 2 horas", text: "Instrucciones claras y directas, justo lo que estaba buscando.", avatar: "LucasArg" }
+        ];
+        let currentCommentIndex = 0;
+
+        function renderHorizontalComment() {
+            const container = document.getElementById('commentCarousel');
+            const c = comments[currentCommentIndex];
+            
+            container.innerHTML = `
+                <div class="flex gap-3 w-full items-start animate-horizontal">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${c.avatar}" alt="Avatar" class="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 flex-shrink-0 shadow-sm">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-extrabold text-slate-800 text-xs">${c.user}</span>
+                            <span class="text-[10px] font-semibold text-slate-400">${c.time}</span>
+                        </div>
+                        <p class="text-slate-600 text-xs mt-1 leading-relaxed font-normal">${c.text}</p>
+                    </div>
+                </div>
+            `;
+            currentCommentIndex = (currentCommentIndex + 1) % comments.length;
+        }
+
+        renderHorizontalComment();
+        setInterval(renderHorizontalComment, 4200);
+
+        // Modal Legal
+        const legalModal = document.getElementById('legalModal');
+        const closeModal = document.getElementById('closeModal');
+        const acceptModal = document.getElementById('acceptModal');
+
+        function openModal(e) {
+            e.preventDefault();
+            legalModal.classList.remove('hidden');
+            setTimeout(() => legalModal.classList.add('opacity-100'), 10);
+        }
+        function hideModal() {
+            legalModal.classList.remove('opacity-100');
+            setTimeout(() => legalModal.classList.add('hidden'), 300);
+        }
+
+        document.getElementById('openTerms').addEventListener('click', openModal);
+        document.getElementById('openPrivacy').addEventListener('click', openModal);
+        closeModal.addEventListener('click', hideModal);
+        acceptModal.addEventListener('click', hideModal);
+        legalModal.addEventListener('click', (e) => { if(e.target === legalModal) hideModal(); });
+    </script>
+</body>
+</html>
